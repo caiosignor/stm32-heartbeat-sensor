@@ -61,6 +61,8 @@
 
 #define Led_Pin GPIO_PIN_13
 #define Led_GPIO_Port GPIOC
+#define SENSOR_Pin GPIO_PIN_0
+#define SENSOR_GPIO_Port GPIOA
 
 /* ########################## Assert Selection ############################## */
 /**
