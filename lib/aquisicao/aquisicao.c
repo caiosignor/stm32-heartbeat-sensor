@@ -4,10 +4,15 @@
 #include "dma.h"
 #include "adc.h"
 #include "cmsis_os.h"
+#define ARM_MATH_CM3
+#include "arm_math.h"
 
 osThreadId handle_tarefa_aquisicao;
-QueueHandle_t amostras;
 uint16_t amostras_dma[AQUISICAO_AMOSTRAS];
+float32_t amostras_pvt[AQUISICAO_AMOSTRAS / 2];
+
+osSemaphoreId consumidor;   // Semaphore ID
+osSemaphoreDef(consumidor); // Semaphore definition
 
 void aquisicao_inicializar_tarefas()
 {
@@ -17,7 +22,7 @@ void aquisicao_inicializar_tarefas()
 
 void aquisicao_inicializar_listas()
 {
-    amostras = xQueueCreate(AQUISICAO_AMOSTRAS, sizeof(uint16_t));
+    consumidor = osSemaphoreCreate(osSemaphore(consumidor), 1);
 }
 
 void aquisicao_inicializar_perifericos()
@@ -29,14 +34,14 @@ void aquisicao_inicializar_perifericos()
 static void aquisicao_tarefa()
 {
     char buffer[64];
-    uint16_t pvt_amostras[AQUISICAO_AMOSTRAS];
     size_t len_msg;
     for (;;)
     {
-        if (xQueueReceive(amostras, pvt_amostras, 10000) == pdPASS)
+        osSemaphoreWait(consumidor, 10000);
+        for (int i = 0; i < AQUISICAO_AMOSTRAS / 2; i++)
         {
-            len_msg = sprintf(buffer, "%i\n", pvt_amostras[0]);
-            HAL_UART_Transmit(&huart1, (uint8_t*)buffer, len_msg, 1000);
-        }        
+            len_msg = sprintf(buffer, "%.0f\n", amostras_pvt[i]);
+            HAL_UART_Transmit(&huart1, (uint8_t *)buffer, len_msg, 1000);
+        }
     }
 }
