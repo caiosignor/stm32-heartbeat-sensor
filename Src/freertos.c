@@ -99,34 +99,35 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   */
 void MX_FREERTOS_Init(void)
 {
-	/* USER CODE BEGIN Init */
-	aquisicao_inicializar_perifericos();
-	/* USER CODE END Init */
+  /* USER CODE BEGIN Init */
+  aquisicao_inicializar_perifericos();
+  /* USER CODE END Init */
 
-	/* USER CODE BEGIN RTOS_MUTEX */
-	/* add mutexes, ... */
-	/* USER CODE END RTOS_MUTEX */
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
 
-	/* USER CODE BEGIN RTOS_SEMAPHORES */
-	/* add semaphores, ... */
-	/* USER CODE END RTOS_SEMAPHORES */
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  aquisicao_inicializar_listas();
+  /* USER CODE END RTOS_SEMAPHORES */
 
-	/* USER CODE BEGIN RTOS_TIMERS */
-	/* start timers, add new ones, ... */
-	/* USER CODE END RTOS_TIMERS */
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
 
-	/* Create the thread(s) */
-	/* definition and creation of defaultTask */
-	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-	defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  /* Create the thread(s) */
+  /* definition and creation of defaultTask */
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-	/* USER CODE BEGIN RTOS_THREADS */
-	aquisicao_inicializar_tarefas();
-	/* USER CODE END RTOS_THREADS */
+  /* USER CODE BEGIN RTOS_THREADS */
+  aquisicao_inicializar_tarefas();
+  /* USER CODE END RTOS_THREADS */
 
-	/* USER CODE BEGIN RTOS_QUEUES */
-	aquisicao_inicializar_listas();
-	/* USER CODE END RTOS_QUEUES */
+  /* USER CODE BEGIN RTOS_QUEUES */
+
+  /* USER CODE END RTOS_QUEUES */
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -139,15 +140,15 @@ void MX_FREERTOS_Init(void)
 void StartDefaultTask(void const *argument)
 {
 
-	/* USER CODE BEGIN StartDefaultTask */
-	/* Infinite loop */
+  /* USER CODE BEGIN StartDefaultTask */
+  /* Infinite loop */
 
-	for (;;)
-	{
-		HAL_GPIO_TogglePin(Led_GPIO_Port, Led_Pin);
-		osDelay(500);
-	}
-	/* USER CODE END StartDefaultTask */
+  for (;;)
+  {
+    HAL_GPIO_TogglePin(Led_GPIO_Port, Led_Pin);
+    osDelay(500);
+  }
+  /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/

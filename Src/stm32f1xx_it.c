@@ -176,7 +176,7 @@ void DMA1_Channel1_IRQHandler(void)
 	/* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
 
 	static uint16_t contador = 0;
-	osSemaphoreRelease(consumidor);
+	osSemaphoreWait(produtor, 10000);
 	uint16_t *pAmostras = &amostras_dma[contador++ * (AQUISICAO_AMOSTRAS / 2)];
 	if (contador == 2)
 		contador = 0;
@@ -185,7 +185,7 @@ void DMA1_Channel1_IRQHandler(void)
 		amostras_pvt[i] = (float_t)(*pAmostras);
 		pAmostras++;
 	}
-
+	osSemaphoreRelease(consumidor);
 	/* USER CODE END DMA1_Channel1_IRQn 0 */
 	HAL_DMA_IRQHandler(&hdma_adc1);
 	/* USER CODE BEGIN DMA1_Channel1_IRQn 1 */

@@ -9,11 +9,12 @@
 #define AQUISICAO_AMOSTRAS 256
 #define AQUISICAO_FREQ_MAX 3
 #define AQUISICAO_FREQ_SMP FREQ_MAX *AMOSTRAS
-#define AQUISICAO_STACK_SIZE 256
+#define AQUISICAO_STACK_SIZE 2048
 #define FFT_SIZE AQUISICAO_AMOSTRAS / 2
 
 extern osThreadId handle_tarefa_aquisicao;
 extern osSemaphoreId consumidor;
+extern osSemaphoreId produtor;   
 extern uint16_t amostras_dma[AQUISICAO_AMOSTRAS];
 float32_t amostras_pvt[AQUISICAO_AMOSTRAS / 2];
 
