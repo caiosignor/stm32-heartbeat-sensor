@@ -55,7 +55,7 @@ static void aquisicao_tarefa()
         for (int i = 0; i < TAMANHO_VETOR; i++)
         {
             // len_msg = sprintf(buffer, "%.0f, %.0f\n", 9848965 / AMOSTRAS_FFT, amostras_pvt[i]);
-            len_msg = sprintf(buffer, "%f\n", fft_entrada[i]);
+            len_msg = sprintf(buffer, "%.0f\n", fft_entrada[i]);
             HAL_UART_Transmit(&huart1, (uint8_t *)buffer, len_msg, 1000);
         }
         len_msg = sprintf(buffer, "#\n");
