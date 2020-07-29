@@ -175,24 +175,7 @@ void SysTick_Handler(void)
 void DMA1_Channel1_IRQHandler(void)
 {
 	/* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
-	static q15_t dma_interrupcao = 0;
-	static q31_t offset_amostras_pvt = 0;
-	q31_t offset = (dma_interrupcao == 0) ? 0 : 128;
-	// arm_copy_f32(&amostras_dma[offset], &dma_pvt[offset], (uint32_t)DMA_BUFFER / 2);
-	for (int i = offset; i < offset + (DMA_BUFFER / 2); i++)
-		dma_pvt[i] = (float32_t)(amostras_dma[i]);
 
-	if (dma_interrupcao++ == 2)
-	{
-		dma_interrupcao = 0;
-		osSemaphoreWait(produtor, 10000);
-		arm_copy_f32(dma_pvt, &amostras_pvt[offset_amostras_pvt == 0 ? 0 : 256], (uint32_t)DMA_BUFFER);
-		if (offset_amostras_pvt++ == 2)
-		{
-			offset_amostras_pvt = 0;
-			osSemaphoreRelease(consumidor);
-		}
-	}
 	/* USER CODE END DMA1_Channel1_IRQn 0 */
 	HAL_DMA_IRQHandler(&hdma_adc1);
 	/* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
