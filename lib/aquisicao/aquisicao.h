@@ -6,17 +6,20 @@
 #include "cmsis_os.h"
 #include "usart.h"
 
-#define AQUISICAO_AMOSTRAS 256
-#define AQUISICAO_FREQ_MAX 3
-#define AQUISICAO_FREQ_SMP FREQ_MAX *AMOSTRAS
-#define AQUISICAO_STACK_SIZE 2048
-#define FFT_SIZE AQUISICAO_AMOSTRAS / 2
+#define FREQUENCIA_BASE 0.5 //Hz - 30bpm
+#define NUMERO_AMOSTRAS 256
+#define FREQUENCIA_AMS FREQUENCIA_BASE *NUMERO_AMOSTRAS
+#define DMA_BUFFER NUMERO_AMOSTRAS
+#define NUMERO_CICLOS 4
+#define TAMANHO_VETOR NUMERO_CICLOS *NUMERO_AMOSTRAS
+#define AMOSTRAS_FFT TAMANHO_VETOR / 2
+#define AQUISICAO_STACK_SIZE 5000
 
 extern osThreadId handle_tarefa_aquisicao;
 extern osSemaphoreId consumidor;
-extern osSemaphoreId produtor;   
-extern uint16_t amostras_dma[AQUISICAO_AMOSTRAS];
-float32_t amostras_pvt[AQUISICAO_AMOSTRAS / 2];
+extern osSemaphoreId produtor;
+extern uint16_t amostras_dma[DMA_BUFFER];
+float32_t amostras_pvt[TAMANHO_VETOR];
 
 void aquisicao_inicializar_tarefas();
 void aquisicao_inicializar_listas();

@@ -66,7 +66,7 @@ void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 10;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 18750;
+  htim2.Init.Period = 56250;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -102,34 +102,33 @@ void MX_TIM2_Init(void)
   }
 
   HAL_TIM_MspPostInit(&htim2);
-
 }
 
-void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM2)
+  if (tim_baseHandle->Instance == TIM2)
   {
-  /* USER CODE BEGIN TIM2_MspInit 0 */
+    /* USER CODE BEGIN TIM2_MspInit 0 */
 
-  /* USER CODE END TIM2_MspInit 0 */
+    /* USER CODE END TIM2_MspInit 0 */
     /* TIM2 clock enable */
     __HAL_RCC_TIM2_CLK_ENABLE();
-  /* USER CODE BEGIN TIM2_MspInit 1 */
+    /* USER CODE BEGIN TIM2_MspInit 1 */
 
-  /* USER CODE END TIM2_MspInit 1 */
+    /* USER CODE END TIM2_MspInit 1 */
   }
 }
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *timHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct;
-  if(timHandle->Instance==TIM2)
+  if (timHandle->Instance == TIM2)
   {
-  /* USER CODE BEGIN TIM2_MspPostInit 0 */
+    /* USER CODE BEGIN TIM2_MspPostInit 0 */
 
-  /* USER CODE END TIM2_MspPostInit 0 */
-  
+    /* USER CODE END TIM2_MspPostInit 0 */
+
     /**TIM2 GPIO Configuration    
     PB3     ------> TIM2_CH2 
     */
@@ -140,28 +139,27 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
 
     __HAL_AFIO_REMAP_TIM2_PARTIAL_1();
 
-  /* USER CODE BEGIN TIM2_MspPostInit 1 */
+    /* USER CODE BEGIN TIM2_MspPostInit 1 */
 
-  /* USER CODE END TIM2_MspPostInit 1 */
+    /* USER CODE END TIM2_MspPostInit 1 */
   }
-
 }
 
-void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM2)
+  if (tim_baseHandle->Instance == TIM2)
   {
-  /* USER CODE BEGIN TIM2_MspDeInit 0 */
+    /* USER CODE BEGIN TIM2_MspDeInit 0 */
 
-  /* USER CODE END TIM2_MspDeInit 0 */
+    /* USER CODE END TIM2_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_TIM2_CLK_DISABLE();
-  /* USER CODE BEGIN TIM2_MspDeInit 1 */
+    /* USER CODE BEGIN TIM2_MspDeInit 1 */
 
-  /* USER CODE END TIM2_MspDeInit 1 */
+    /* USER CODE END TIM2_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 

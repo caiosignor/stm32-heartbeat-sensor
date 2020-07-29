@@ -175,17 +175,31 @@ void DMA1_Channel1_IRQHandler(void)
 {
 	/* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
 
-	static uint16_t contador = 0;
-	osSemaphoreWait(produtor, 10000);
-	uint16_t *pAmostras = &amostras_dma[contador++ * (AQUISICAO_AMOSTRAS / 2)];
-	if (contador == 2)
-		contador = 0;
-	for (int i = 0; i < AQUISICAO_AMOSTRAS / 2; i++)
+	static uint32_t contador = 0;
+	static float32_t *pAmostras;
+	static float32_t *pAmostrasDma;
+	osSemaphoreWait(produtor, 50000);
+	if (contador < NUMERO_CICLOS * 2)
 	{
-		amostras_pvt[i] = (float_t)(*pAmostras);
-		pAmostras++;
+		pAmostras = (contador == 0) ? &amostras_pvt[0] : &amostras_pvt[(uint32_t)(contador * (DMA_BUFFER / 2))];
+		pAmostrasDma = &amostras_dma[(contador % 2) * (DMA_BUFFER / 2)];
+		// arm_copy_f32(pAmostrasDma, pAmostras, DMA_BUFFER / 2);
+		// amostras_pvt[0] = amostras_dma[(uint32_t)(contador % 2) * (DMA_BUFFER / 2)];
+		int i = (contador % 2) * (DMA_BUFFER / 2);
+		int contador = 0;
+		while (contador++ < (DMA_BUFFER) / 2)
+		{
+			*pAmostras = *pAmostrasDma;
+			pAmostras++;
+			pAmostrasDma++;
+		}
 	}
-	osSemaphoreRelease(consumidor);
+	else
+	{
+		osSemaphoreRelease(consumidor);
+		contador = 0;
+	}
+	contador++;
 	/* USER CODE END DMA1_Channel1_IRQn 0 */
 	HAL_DMA_IRQHandler(&hdma_adc1);
 	/* USER CODE BEGIN DMA1_Channel1_IRQn 1 */

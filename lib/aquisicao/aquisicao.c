@@ -9,17 +9,17 @@
 #include "arm_const_structs.h"
 
 osThreadId handle_tarefa_aquisicao;
-uint16_t amostras_dma[AQUISICAO_AMOSTRAS];
-float32_t amostras_pvt[AQUISICAO_AMOSTRAS / 2];
+uint16_t amostras_dma[DMA_BUFFER];
+float32_t amostras_pvt[TAMANHO_VETOR];
 
 osSemaphoreId consumidor;   // Semaphore ID
 osSemaphoreDef(consumidor); // Semaphore definition
-osSemaphoreId produtor;   // Semaphore ID
-osSemaphoreDef(produtor); // Semaphore definition
+osSemaphoreId produtor;     // Semaphore ID
+osSemaphoreDef(produtor);   // Semaphore definition
 
 void aquisicao_inicializar_tarefas()
 {
-    osThreadDef(tarefa_aquisicao_nome, aquisicao_tarefa, osPriorityNormal, 0, AQUISICAO_STACK_SIZE/4);
+    osThreadDef(tarefa_aquisicao_nome, aquisicao_tarefa, osPriorityNormal, 0, AQUISICAO_STACK_SIZE / 4);
     handle_tarefa_aquisicao = osThreadCreate(osThread(tarefa_aquisicao_nome), NULL);
 }
 
@@ -32,7 +32,7 @@ void aquisicao_inicializar_listas()
 
 void aquisicao_inicializar_perifericos()
 {
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)amostras_dma, AQUISICAO_AMOSTRAS);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)amostras_dma, DMA_BUFFER);
     HAL_TIM_OC_Start(&htim2, TIM_CHANNEL_2);
 }
 
@@ -40,19 +40,27 @@ static void aquisicao_tarefa()
 {
     char buffer[64];
     size_t len_msg;
-    float32_t sinal[AQUISICAO_AMOSTRAS / 2];
+    float32_t fft_abs[TAMANHO_VETOR];
+    float32_t fft_entrada[TAMANHO_VETOR];
     for (;;)
     {
         osSemaphoreWait(consumidor, 10000);
-        arm_copy_f32(amostras_pvt, sinal, AQUISICAO_AMOSTRAS / 2);
-        arm_cfft_f32(&arm_cfft_sR_f32_len64, sinal, 0, 1);
-        arm_cmplx_mag_f32(sinal, sinal, 64);
+        arm_copy_f32(amostras_pvt, fft_entrada, TAMANHO_VETOR);
+        // arm_cfft_f32(&arm_cfft_sR_f32_len512, fft_entrada, 0, 1);
+        // arm_cmplx_mag_f32(fft_entrada, fft_abs, 256);
 
-        for (int i = 0; i < 64; i++)
+        fft_abs[0] = 0;
+        len_msg = sprintf(buffer, "@\n");
+        HAL_UART_Transmit(&huart1, (uint8_t *)buffer, len_msg, 1000);
+        for (int i = 0; i < TAMANHO_VETOR; i++)
         {
-            len_msg = sprintf(buffer, "%.0f\n", sinal[i]);          
+            // len_msg = sprintf(buffer, "%.0f, %.0f\n", 9848965 / AMOSTRAS_FFT, amostras_pvt[i]);
+            len_msg = sprintf(buffer, "%f\n", fft_entrada[i]);
             HAL_UART_Transmit(&huart1, (uint8_t *)buffer, len_msg, 1000);
         }
+        len_msg = sprintf(buffer, "#\n");
+        HAL_UART_Transmit(&huart1, (uint8_t *)buffer, len_msg, 1000);
+
         osSemaphoreRelease(produtor);
     }
 }
