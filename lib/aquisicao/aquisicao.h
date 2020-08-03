@@ -13,7 +13,7 @@
 #define NUMERO_CICLOS 2
 #define TAMANHO_VETOR NUMERO_CICLOS *NUMERO_AMOSTRAS
 #define AMOSTRAS_FFT TAMANHO_VETOR / 2
-#define AQUISICAO_STACK_SIZE 5000
+#define AQUISICAO_STACK_SIZE 6500
 
 extern osThreadId handle_tarefa_aquisicao;
 extern osSemaphoreId consumidor;

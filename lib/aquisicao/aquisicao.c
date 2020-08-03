@@ -14,8 +14,6 @@ float32_t amostras_pvt[TAMANHO_VETOR];
 
 osSemaphoreId consumidor;   // Semaphore ID
 osSemaphoreDef(consumidor); // Semaphore definition
-osSemaphoreId produtor;     // Semaphore ID
-osSemaphoreDef(produtor);   // Semaphore definition
 
 void aquisicao_inicializar_tarefas()
 {
@@ -26,14 +24,12 @@ void aquisicao_inicializar_tarefas()
 void aquisicao_inicializar_listas()
 {
     consumidor = osSemaphoreCreate(osSemaphore(consumidor), 1);
-    produtor = osSemaphoreCreate(osSemaphore(produtor), 1);
-    osSemaphoreRelease(produtor);
 }
 
 void aquisicao_inicializar_perifericos()
 {
     HAL_ADC_Start_DMA(&hadc1, (uint32_t *)amostras_dma, DMA_BUFFER);
-    HAL_TIM_OC_Start(&htim2, TIM_CHANNEL_2);
+    HAL_TIM_OC_Start(&htim3, TIM_CHANNEL_1);
 }
 float32_t fft_entrada[TAMANHO_VETOR];
 static void aquisicao_tarefa()
@@ -41,10 +37,12 @@ static void aquisicao_tarefa()
     char buffer[64];
     size_t len_msg;
     float32_t fft_abs[AMOSTRAS_FFT];
-    osSemaphoreWait(consumidor, 100000);
     for (;;)
     {
-        osSemaphoreWait(consumidor, 100000);
+        osSemaphoreWait(consumidor, 1000);
+
+        for (int i = 0; i < DMA_BUFFER; i++)
+            amostras_pvt[i] = (float32_t)amostras_dma[i];
 
         arm_scale_f32(amostras_pvt, 1.0, fft_entrada, TAMANHO_VETOR);
         arm_cfft_f32(&arm_cfft_sR_f32_len256, fft_entrada, 0, 1);
@@ -61,14 +59,12 @@ static void aquisicao_tarefa()
         len_msg = sprintf(buffer, "#\n");
         HAL_UART_Transmit(&huart1, (uint8_t *)buffer, len_msg, 1000);
 
-        osSemaphoreRelease(produtor);
+        HAL_ADC_Start_DMA(&hadc1, (uint32_t *)amostras_dma, DMA_BUFFER);
     }
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-    osSemaphoreWait(produtor, 10000000);
-    for (int i = 0; i < DMA_BUFFER; i++)
-        amostras_pvt[i] = (float32_t)amostras_dma[i];
+    HAL_ADC_Stop_DMA(&hadc1);
     osSemaphoreRelease(consumidor);
 }
